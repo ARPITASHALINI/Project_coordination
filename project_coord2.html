@@ -8,11 +8,21 @@
     <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700' rel='stylesheet'>
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js'></script>
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css' rel='stylesheet' />
+    
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.5.1/mapbox-gl-geocoder.min.js"></script>
+    <link
+    rel="stylesheet"
+    href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.5.1/mapbox-gl-geocoder.css"
+    type="text/css"
+    />
+    <link href="https://fonts.googleapis.com/css2?family=Cabin+Sketch:wght@700&display=swap" rel="stylesheet">
+    
+    
     <style>
       body {
         color:#404040;
         font:400 15px/22px 'Source Sans Pro', 'Helvetica Neue', Sans-serif;
-        margin:0;
+        margin-top:100px;
         padding:0;
         -webkit-font-smoothing:antialiased;
       }
@@ -21,6 +31,12 @@
         -webkit-box-sizing:border-box;
         -moz-box-sizing:border-box;
         box-sizing:border-box;
+      }
+      @font-face {
+      font-family: 'All Ages';
+      src: url('../fonts/AllAgesDemo-2DPX.ttf');
+      src: url('../fonts/AllAgesDemoBold-vX1L.ttf') format('truetype'),
+        url('../fonts/AllAgesDemoBoldItalic-wgR9.ttf') format('truetype');
       }
 
       .sidebar {
@@ -40,14 +56,18 @@
         left:33.3333%;
         width:66.6666%;
         top:0;bottom:0;
+        margin-top:80px;
+        border-top:10px solid white;
       }
 
       h1 {
+        font-family: 'Cabin Sketch', cursive;
         font-size:22px;
         margin:0;
         font-weight:400;
         line-height: 20px;
         padding: 20px 2px;
+        color: whitesmoke;
       }
 
       a {
@@ -61,11 +81,13 @@
 
       .heading {
         background:#fff;
+        border-left: 10px solid black;
         border-bottom:1px solid #eee;
+        border-right: 10px solid black;
         min-height:60px;
-        line-height:60px;
-        padding:0 10px;
-        background-color: #00853e;
+        line-height:80px;
+        padding:10px 10px;
+        background-color: #f14545e8;
         color: #fff;
       }
 
@@ -78,20 +100,21 @@
       .listings .item {
         display:block;
         border-bottom:1px solid #eee;
-        padding:10px;
+        padding:15px;
+        padding-left: 20px;
         text-decoration:none;
       }
 
-      .listings .item:last-child { border-bottom:none; }
+      .listings .item:last-child { border-bottom:none; padding-bottom: 200px }
       .listings .item .title {
         display:block;
-        color:#00853e;
+        color:#d80d0d;
         font-weight:700;
       }
 
       .listings .item .title small { font-weight:400; }
       .listings .item.active .title,
-      .listings .item .title:hover { color:#8cc63f; }
+      .listings .item .title:hover { color:#da3737; }
       .listings .item.active {
         background-color:#f8f8f8;
       }
@@ -105,16 +128,16 @@
         background:none;
       }
       ::-webkit-scrollbar-thumb {
-        background:#00853e;
+        background:#960b0b;
         border-radius:0;
       }
 
       .marker {
         border: none;
         cursor: pointer;
-        height: 56px;
-        width: 56px;
-        background-image: url(marker.png);
+        height: 80px;
+        width: 80px;
+        background-image: url("https://i.gifer.com/13vO.gif");
         background-color: rgba(0, 0, 0, 0);
       }
 
@@ -144,11 +167,11 @@
         padding:1%;
       }
       .mapboxgl-popup-content h3 {
-        background:#91c949;
+        background:#ec5151;
         color:#fff;
         margin:0;
         display:block;
-        padding:10px;
+        padding:20px;
         border-radius:3px 3px 0 0;
         font-weight:700;
         margin-top:-15px;
@@ -176,9 +199,42 @@
       .mapboxgl-popup-anchor-top > .mapboxgl-popup-tip {
         border-bottom-color: #91c949;
       }
+      .navbar {
+        font-family: 'Cabin Sketch', cursive;
+
+        background-color: #333;
+        position: fixed; /* Set the navbar to fixed position */
+        top: 0; /* Position the navbar at the top of the page */
+        width: 100%; /* Full width */
+        border-left:10px solid black;
+        border-bottom:10px solid white;
+        border-right:10px solid black;
+        background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.8)),url("https://media.gettyimages.com/vectors/massachusetts-map-on-grunge-canvas-background-vector-id516178772?s=612x612");
+
+      }
+      .navbar a {
+        float: right;
+        display: block;
+        color: #f2f2f2;
+        text-align: center;
+        padding: 30px 16px;
+        text-decoration: none;
+        padding-right: 7%; font-size:30px;
+      }
+
+      /* Change background on mouse-over */
+      .navbar a:hover {
+        background: #ddd;
+        color: black;
+        padding-left: 12%;
+      }
     </style>
-  </head>
+ </head>
   <body>
+    <div class="navbar">
+        <a href="index.html">Output 1</a>
+        <a href="project_coord2.html">Output2</a>
+    </div>
     <div class='sidebar'>
       <div class='heading'>
         <h1>Current disaster struck areas</h1>
@@ -209,171 +265,143 @@
       });
 
       var stores = {
-        "type": "FeatureCollection",
-        "features": [
-          {
-            "type": "Feature",
-            "geometry": {
-              "type": "Point",
-              "coordinates": [
-                -120.5000,
-                44.000
-              ]
-            },
-            "properties": {
-              "State": "Oregon",
-              "Incident_Type": "Wildfire",
-              "Total Fire Amount in 2020": none,
-              "Total Acres Burned": "1200000",
-              "Homes Destroyed": "4009",
-              "Damage Cost": "609000000",
-              "Overnight Stays": "121800",
-              "Meals provided": "388300",
-              "Releif Items provided": "13600",
-              "Care Contacts": "20800",
-              "Household Financial Assistance": "1730"
-            }
-          },
-          {
-            "type": "Feature",
-            "geometry": {
-              "type": "Point",
-              "coordinates": [
-                -120.740135,
-                47.751076
-              ]
-            },
-            "properties": {
-              "State": "Washington",
-              "Incident_Type": "Wildfire",
-              "Total Fire Amount in 2020": none,
-              "Total Acres Burned": none,
-              "Homes Destroyed": none,
-              "Damage Cost": none,
-              "Overnight Stays": "3600",
-              "Meals provided": "15300",
-              "Releif Items provided": "13600",
-              "Care Contacts": none,
-              "Household Financial Assistance": "70"
-            }
-          },
-          {
-            "type": "Feature",
-            "geometry": {
-              "type": "Point",
-              "coordinates": [
-                -114.1718466,
-                46.637976
-              ]
-            },
-            "State": "Montana & Idaho",
-              "Incident_Type": "Wildfire",
-              "Total Fire Amount in 2020": none,
-              "Total Acres Burned": none,
-              "Homes Destroyed": none,
-              "Damage Cost": none,
-              "Overnight Stays": none,
-              "Meals provided": "900",
-              "Releif Items provided": none,
-              "Care Contacts": "100",
-              "Household Financial Assistance": none
-          },
-          {
-            "type": "Feature",
-            "geometry": {
-              "type": "Point",
-              "coordinates": [
-                -106.9585507,
-                41.2225205
-              ]
-            },
-            "properties": {
-              "State": "Wyoming & Colorado",
-              "Incident_Type": "Wildfire",
-              "Total Fire Amount in 2020": none,
-              "Total Acres Burned": "700000 for colorado",
-              "Homes Destroyed": none,
-              "Damage Cost": none,
-              "Overnight Stays": "38400",
-              "Meals provided": "38700",
-              "Releif Items provided": none,
-              "Care Contacts": "4200",
-              "Household Financial Assistance": none
-            }
-          },
-          {
-            "type": "Feature",
-            "geometry": {
-              "type": "Point",
-              "coordinates": [
-                -119.417931,
-                36.778259
-              ]
-            },
-            "properties": {
-              "State": "California",
-              "Incident_Type": "Wildfire",
-              "Total Fire Amount in 2020": "9096",
-              "Total Acres Burned": "4200000",
-              "Homes Destroyed": none,
-              "Damage Cost": none,
-              "Overnight Stays": "236800",
-              "Meals provided": "457900",
-              "Releif Items provided": "40100",
-              "Care Contacts": "29800",
-              "Household Financial Assistance": "1220"
-            }
-          },
-          {
-            "type": "Feature",
-            "geometry": {
-              "type": "Point",
-              "coordinates": [
-                -93.520886,
-                30.2423071
-              ]
-            },
-            "properties": {
-              "Area": "Gulf Coast",
-              "Incident_Type": "Hurricane",
-              "Total Fire Amount in 2020": none,
-              "Total Acres Burned": none,
-              "Homes Destroyed": none,
-              "Damage Cost": "19000000000",
-              "Overnight Stays": "759400",
-              "Meals provided": "38700",
-              "Releif Items provided": "1900000",
-              "Care Contacts": "231300",
-              "Household Financial Assistance": "53400"
-            }
-          },
-          {
-            "type": "Feature",
-            "geometry": {
-              "type": "Point",
-              "coordinates": [
-                -81.760254,
-                27.94402
-              ]
-            },
-            "properties": {
-              "State": "Florida",
-              "Incident_Type": "Hurricane",
-              "Total Fire Amount in 2020": none,
-              "Total Acres Burned": none,
-              "Homes Destroyed": none,
-              "Damage Cost": "25000000",
-              "Overnight Stays": "808400",
-              "Meals provided": "2000000",
-              "Releif Items provided": "287400",
-              "Care Contacts": "60900",
-              "Household Financial Assistance": "8760"
-            }
-          }
-        ]
-      };                   
-             
-      
+   "type": "FeatureCollection",
+   "features": [
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -120.5000,44.0000 ]
+    },
+    "properties": {
+    "Technician":"Max",
+    "State":"Oregon",
+    "Incident_Type":"Wildfire",
+    "Total Fire Amount in 2020":null,
+    "Total Acres Burned":"1200000",
+    "Homes_Destroyed":4009,
+    "Damage_Cost":609000000,
+    "Overnight Stays":121800,
+    "Meals":388300,
+    "Relief Items":13600,
+    "Care Contacts":20800,
+    "Household_Financial_Assistantce":1730,
+    "FIELD15":""
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -120.740135,47.751076 ]
+    },
+    "properties": {
+    "Technician":"Max",
+    "State":"Washington",
+    "Incident_Type":"Wildfire",
+    "Total Fire Amount in 2020":null,
+    "Total Acres Burned":"",
+    "Homes_Destroyed":null,
+    "Damage_Cost":null,
+    "Overnight Stays":3600,
+    "Meals":15300,
+    "Relief Items":2200,
+    "Care Contacts":null,
+    "Household_Financial_Assistantce":70,
+    "FIELD15":""
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -114.1718466,46.637976 ]
+    },
+    "properties": {
+    "Technician":"Max",
+    "State":"Montana & Idaho",
+    "Incident_Type":"Wildfire",
+    "Total Fire Amount in 2020":null,
+    "Total Acres Burned":"",
+    "Homes_Destroyed":null,
+    "Damage_Cost":null,
+    "Overnight Stays":null,
+    "Meals":900,
+    "Relief Items":null,
+    "Care Contacts":100,
+    "Household_Financial_Assistantce":null,
+    "FIELD15":""
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -106.9585507,41.2225205 ]
+    },
+    "properties": {
+    "Technician":"Samuel",
+    "State":"Wyoming & Colorado",
+    "Incident_Type":"Wildfire",
+    "Total Fire Amount in 2020":null,
+    "Total Acres Burned":"700000(colorado)",
+    "Homes_Destroyed":null,
+    "Damage_Cost":null,
+    "Overnight Stays":38400,
+    "Meals":38700,
+    "Relief Items":null,
+    "Care Contacts":4200,
+    "Household_Financial_Assistantce":null,
+    "FIELD15":""
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -119.417931,36.778259 ]
+    },
+    "properties": {
+    "Technician":"Samuel",
+    "State":"California",
+    "Incident_Type":"Wildfire",
+    "Total Fire Amount in 2020":9096,
+    "Total Acres Burned":"4200000",
+    "Homes_Destroyed":null,
+    "Damage_Cost":null,
+    "Overnight Stays":236800,
+    "Meals":457900,
+    "Relief Items":40100,
+    "Care Contacts":29800,
+    "Household_Financial_Assistantce":1220,
+    "FIELD15":""
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -93.520886,30.2423071 ]
+    },
+    "properties": {
+    "Technician":"Arpita",
+    "State":"Gulf Coast",
+    "Incident_Type":"Hurricane",
+    "Total Fire Amount in 2020":null,
+    "Total Acres Burned":"",
+    "Homes_Destroyed":null,
+    "Damage_Cost":19000000000,
+    "Overnight Stays":759400,
+    "Meals":1900000,
+    "Relief Items":231300,
+    "Care Contacts":53400,
+    "Household_Financial_Assistantce":7600,
+    "FIELD15":""
+    }
+  }
+]
+};
+                       
       /**
        * Assign a unique id to each store. You'll use this `id`
        * later to associate each point on the map with a listing
@@ -479,7 +507,7 @@
           var details = listing.appendChild(document.createElement('div'));
           details.innerHTML = prop.city;
           if (prop.phone) {
-            details.innerHTML += ' · ' + prop.phoneFormatted;
+            details.innerHTML = ' - ' + prop.phoneFormatted;
           }
 
           /**
